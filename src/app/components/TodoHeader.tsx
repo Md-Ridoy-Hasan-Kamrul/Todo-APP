@@ -1,15 +1,14 @@
-// src/components/TodoHeader.tsx
 'use client';
 
 import { GiMoonBats, GiSun } from 'react-icons/gi';
 
 interface TodoHeaderProps {
   taskCount: number;
-  theme: string; // Accepts 'light' or 'dark'
+  theme: 'light' | 'dark';
   toggleTheme: () => void;
 }
 
-const getGreeting = () => {
+const getGreeting = (): string => {
   const hour = new Date().getHours();
   if (hour < 12) return 'Good morning';
   if (hour < 18) return 'Good afternoon';
@@ -21,19 +20,23 @@ export default function TodoHeader({
   theme,
   toggleTheme,
 }: TodoHeaderProps) {
+  const greeting = getGreeting();
+
   return (
-    <header className='flex justify-between items-center mb-8'>
+    <header className='flex flex-wrap sm:flex-nowrap justify-between items-center gap-4 mb-8'>
       <div>
         <h1 className='text-3xl md:text-4xl font-bold tracking-tight text-gray-900 dark:text-white'>
-          {getGreeting()}
+          {greeting}
         </h1>
         <p className='text-gray-500 dark:text-gray-400'>
-          You have {taskCount} tasks left.
+          You have {taskCount} task{taskCount !== 1 && 's'} left.
         </p>
       </div>
+
       <button
-        onClick={toggleTheme} // Use the passed-in toggle function
+        onClick={toggleTheme}
         className='p-2 rounded-full text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900'
+        aria-label='Toggle theme'
       >
         {theme === 'dark' ? <GiSun size={22} /> : <GiMoonBats size={22} />}
       </button>

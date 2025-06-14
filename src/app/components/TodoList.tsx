@@ -1,4 +1,5 @@
 // src/components/TodoList.tsx
+
 import { Todo } from '../types';
 import TodoItem from './TodoItem';
 
@@ -17,14 +18,16 @@ export default function TodoList({
   onDelete,
   onEdit,
 }: TodoListProps) {
-  if (todos.length === 0) {
+  const isEmpty = todos.length === 0;
+  const emptyMessage =
+    filter === 'completed'
+      ? "You haven't completed any tasks yet."
+      : 'No tasks here. Add one to get started!';
+
+  if (isEmpty) {
     return (
-      <div className='text-center py-10'>
-        <p className='text-gray-500 dark:text-gray-400'>
-          {filter === 'completed'
-            ? "You haven't completed any tasks yet."
-            : 'No tasks here. Add one to get started!'}
-        </p>
+      <div className='text-center py-10 px-4'>
+        <p className='text-gray-500 dark:text-gray-400'>{emptyMessage}</p>
       </div>
     );
   }

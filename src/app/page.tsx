@@ -1,4 +1,3 @@
-// src/app/page.tsx
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
@@ -18,51 +17,43 @@ export default function Home() {
     deleteTodo,
     updateTodo,
   } = useTodos();
-  const [filter, setFilter] = useState('all');
+
+  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
-  // This state will now ONLY hold the string 'light' or 'dark'
-  const [theme, setTheme] = useState('dark');
-
-  // This effect runs ONCE on component mount to set the initial theme
+  // Load saved theme on mount
   useEffect(() => {
     try {
-      const savedTheme = localStorage.getItem('theme') || 'dark';
-      setTheme(savedTheme);
-      // Directly apply the class on initial load
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    } catch (error) {
-      console.error('Error loading theme from localStorage', error);
+      const saved = localStorage.getItem('theme') as 'light' | 'dark' | null;
+      const initialTheme = saved || 'dark';
+      setTheme(initialTheme);
+      document.documentElement.classList.toggle(
+        'dark',
+        initialTheme === 'dark'
+      );
+    } catch (err) {
+      console.error('Error loading theme from localStorage', err);
     }
-  }, []); // Empty dependency array means this runs only once on mount
+  }, []);
 
-  // This function handles the toggle logic
   const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
+    const newTheme: 'light' | 'dark' = theme === 'light' ? 'dark' : 'light';
     try {
       localStorage.setItem('theme', newTheme);
       setTheme(newTheme);
-      // Directly apply the class when toggling
-      if (newTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    } catch (error) {
-      console.error('Error saving theme to localStorage', error);
+      document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    } catch (err) {
+      console.error('Error saving theme to localStorage', err);
     }
   };
 
   const filteredTodos = useMemo(() => {
     switch (filter) {
       case 'active':
-        return todos.filter((todo) => !todo.completed);
+        return todos.filter((t) => !t.completed);
       case 'completed':
-        return todos.filter((todo) => todo.completed);
+        return todos.filter((t) => t.completed);
       default:
         return todos;
     }
@@ -71,10 +62,9 @@ export default function Home() {
   const handleEdit = (todo: Todo) => setEditingTodo(todo);
   const cancelEdit = () => setEditingTodo(null);
   const handleUpdate = (text: string) => {
-    if (editingTodo) {
-      updateTodo(editingTodo.id, text);
-      setEditingTodo(null);
-    }
+    if (!editingTodo) return;
+    updateTodo(editingTodo.id, text);
+    setEditingTodo(null);
   };
 
   return (
@@ -82,7 +72,6 @@ export default function Home() {
       <div className='container mx-auto max-w-2xl px-4 py-8 md:py-12'>
         <TodoHeader
           taskCount={uncompletedTasksCount}
-          // Pass the current theme and the toggle function to the header
           theme={theme}
           toggleTheme={toggleTheme}
         />
@@ -104,3 +93,4 @@ export default function Home() {
     </main>
   );
 }
+// This is the main entry point for the Todo application.
